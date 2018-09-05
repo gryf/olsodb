@@ -5,7 +5,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 
 
-class _Base(models.ModelBase, models.TimestampMixin):
+class _Base(models.ModelBase):
     pass
 
 
@@ -13,6 +13,6 @@ DeclarativeBase = declarative_base(cls=_Base)
 
 
 class Foo(DeclarativeBase):
-    __tablename__ = 'oslo_db_to_rak'
+    __tablename__ = 'oslodb'
     id = Column(Integer, primary_key=True)
     value = Column(String(39), nullable=False)
