@@ -25,17 +25,37 @@ def create_schema():
 
 
 # CRUD operations
-def create_foo(context, value):
-    return IMPL.create_foo(context, value)
+def create_company(context, data):
+    return IMPL.create_company(context, data)
 
 
-def read_foos(context, value=None):
-    return IMPL.read_foos(context, value=None)
+def read_companies(context, id_=None, name=None):
+    return IMPL.read_companies(context, id_, name)
 
 
-def update_foo(context, old_value, new_value):
-    return IMPL.update_foo(context, old_value, new_value)
+def update_company(context, data):
+    return IMPL.update_company(context, data)
 
 
-def delete_foo(context, value):
-    return IMPL.delete_foo(context, value)
+def delete_company(context, data):
+    return IMPL.delete_company(context, data)
+
+
+def create_product(context, data):
+    return IMPL.create_product(context, data)
+
+
+def read_products(context, id_=None, name=None, price=None):
+    return IMPL.read_products(context, id_, name, price)
+
+
+def update_product(context, data):
+    return IMPL.update_product(context, data)
+
+
+def delete_product(context, data):
+    return IMPL.delete_product(context, data)
+
+
+def get_company_products(context, company_id):
+    return IMPL.get_company_products(context, company_id)

@@ -1,6 +1,5 @@
 import sys
 
-import alembic.migration as alembic_migration
 from oslo_config import cfg
 from oslo_db.sqlalchemy import enginefacade
 from oslo_db import options
@@ -13,10 +12,6 @@ storage_context_manager = enginefacade.transaction_context()
 
 @enginefacade.transaction_context_provider
 class Context(object):
-    pass
-
-
-class DBMigrationException(Exception):
     pass
 
 
@@ -44,62 +39,107 @@ def create_schema(config=None, engine=None):
     if engine is None:
         engine = enginefacade.writer.get_engine()
 
-    # This check might be ignored, but in certain point of time it *will* turn
-    # out that you need migrations :)
-    if version(engine=engine) is not None:
-        raise DBMigrationException('DB schema is already under version '
-                                   'control. Use upgrade() instead.')
-
     models.DeclarativeBase.metadata.create_all(engine)
 
 
-def version(config=None, engine=None):
-    if engine is None:
-        engine = enginefacade.writer.get_engine()
-
-    with engine.connect() as conn:
-        context = alembic_migration.MigrationContext.configure(conn)
-        return context.get_current_revision()
-
-
 @enginefacade.writer
-def create_foo(context, value):
-    foo = models.Foo()
-    foo.value = value
-    context.session.add(foo)
-    return foo
+def create_company(context, data):
+    company = models.Company()
+    if 'id' in data:
+        del data['id']
+    company.update(data)
+    context.session.add(company)
+    return company
 
 
 @enginefacade.reader
-def read_foos(context, value=None):
-    query = context.session.query(models.Foo)
-    if value:
-        query = query.filter(models.Foo.value == value)
+def read_companies(context, id_=None, name=None):
+    query = context.session.query(models.Company)
+    if id_:
+        query = query.filter(models.Company.id == id_)
+    if name:
+        query = query.filter(models.Company.name == 'name')
 
     return query.all()
 
 
 @enginefacade.writer
-def update_foo(context, old_value, new_value):
-    foo = (context.session.query(models.Foo)
-           .filter(models.Foo.value == old_value)).one_or_none()
+def update_company(context, data):
+    query = context.session.query(models.Company)
+    if 'id' in data:
+        company = query.filter(models.Company.id == data['id']).one()
+    else:
+        raise RecordNotFoundException('Cannot update Company without '
+                                      'company id')
 
-    if not foo:
-        raise RecordNotFoundException('Cannot find element with value "%s".',
-                                      old_value)
-
-    foo.value = new_value
-    foo.save(context.session)
-    return foo
+    company.update(data)
+    company.save(context.session)
+    return company
 
 
 @enginefacade.writer
-def delete_foo(context, value):
-    foo = (context.session.query(models.Foo)
-           .filter(models.Foo.value == value)).one_or_none()
+def delete_company(context, data):
+    query = context.session.query(models.Company)
+    if 'id' in data:
+        company = query.filter(models.Company.id == data['id']).one()
+    else:
+        raise RecordNotFoundException('Cannot delete Company without '
+                                      'company id')
 
-    if not foo:
-        raise RecordNotFoundException('Cannot find element with value "%s".',
-                                      value)
+    context.session.delete(company)
 
-    context.session.delete(foo)
+
+@enginefacade.writer
+def create_product(context, data):
+    company = models.Company()
+    if 'id' in data:
+        del data['id']
+    company.update(data)
+    context.session.add(company)
+    return company
+
+
+@enginefacade.reader
+def read_products(context, id_=None, name=None, price=None):
+    query = context.session.query(models.Company)
+    if id_:
+        query = query.filter(models.Company.id == id_)
+    if name:
+        query = query.filter(models.Company.name == 'name')
+
+    return query.all()
+
+
+@enginefacade.writer
+def update_product(context, data):
+    query = context.session.query(models.Company)
+    if 'id' in data:
+        company = query.filter(models.Company.id == data['id']).one()
+    else:
+        raise RecordNotFoundException('Cannot update Company without '
+                                      'company id')
+
+    company.update(data)
+    company.save(context.session)
+    return company
+
+
+@enginefacade.writer
+def delete_product(context, data):
+    query = context.session.query(models.Company)
+    if 'id' in data:
+        company = query.filter(models.Company.id == data['id']).one()
+    else:
+        raise RecordNotFoundException('Cannot delete Company without '
+                                      'company id')
+
+    context.session.delete(company)
+
+
+@enginefacade.reader
+def get_company_products(context, company_id):
+    query = (context.session.query(models.Product)
+             .join(models.Company)
+             .filter(models.Company.id == company_id))
+
+    return query.all()
