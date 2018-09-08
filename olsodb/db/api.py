@@ -29,8 +29,8 @@ def create_company(context, data):
     return IMPL.create_company(context, data)
 
 
-def read_companies(context, id_=None, name=None):
-    return IMPL.read_companies(context, id_, name)
+def read_companies(context, data):
+    return IMPL.read_companies(context, data)
 
 
 def update_company(context, data):
@@ -45,8 +45,8 @@ def create_product(context, data):
     return IMPL.create_product(context, data)
 
 
-def read_products(context, id_=None, name=None, price=None):
-    return IMPL.read_products(context, id_, name, price)
+def read_products(context, data):
+    return IMPL.read_products(context, data)
 
 
 def update_product(context, data):
@@ -57,5 +57,5 @@ def delete_product(context, data):
     return IMPL.delete_product(context, data)
 
 
-def get_company_products(context, company_id):
-    return IMPL.get_company_products(context, company_id)
+def get_company_products(context, data):
+    return IMPL.get_company_products(context, data)

@@ -53,12 +53,12 @@ def create_company(context, data):
 
 
 @enginefacade.reader
-def read_companies(context, id_=None, name=None):
+def read_companies(context, data):
     query = context.session.query(models.Company)
-    if id_:
-        query = query.filter(models.Company.id == id_)
-    if name:
-        query = query.filter(models.Company.name == 'name')
+    if 'id' in data:
+        query = query.filter(models.Company.id == data['id'])
+    if 'name' in data:
+        query = query.filter(models.Company.name == data['name'])
 
     return query.all()
 
